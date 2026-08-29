@@ -1,0 +1,218 @@
+/* INSPACE STUDIO — static site styles (WordPress-ready, no build step) */
+/* INSPACE STUDIO — shared site theme. Loaded by every page. */
+:root {
+  --font-heading: 'Barlow', system-ui, sans-serif;
+  --font-body: 'Montserrat', system-ui, sans-serif;
+  --color-bg: #100f0e;
+  --color-surface: #1a1917;
+  --color-text: #ffffff;
+  --color-accent: #ffffff;
+  --color-accent-700: color-mix(in srgb, #f2eee7 62%, transparent);
+  --color-divider: color-mix(in srgb, #f2eee7 30%, transparent);
+  --color-neutral-100: #171614;
+  --color-neutral-200: #262421;
+  --color-neutral-300: #3a3733;
+  --color-neutral-400: #55514c;
+  --color-neutral-500: #7a756e;
+  --color-neutral-600: #9c968e;
+  --color-neutral-700: #bdb7ae;
+  --color-neutral-800: #dcd6cd;
+  --color-neutral-900: #0a0908;
+  --on-accent: #f7f3ee;
+  --site-header-h: 52px;
+}
+
+::selection { background: color-mix(in srgb, var(--color-accent) 45%, transparent); }
+
+body { margin: 0; text-wrap: pretty; overflow: hidden; }
+a { color: var(--color-accent); text-underline-offset: 3px; }
+a:hover { color: var(--color-accent-700); }
+
+.input { background: var(--color-neutral-100); color: var(--color-text); border-color: var(--color-divider); }
+.input::placeholder { color: color-mix(in srgb, var(--color-text) 45%, transparent); }
+.tag-outline { color: var(--color-text); border-color: var(--color-divider); }
+
+/* Scroll shell — one per page, id varies */
+.site-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+.site-scroll::-webkit-scrollbar { width: 0; height: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .site-scroll { scroll-behavior: auto; scroll-snap-type: none; }
+}
+
+/* Header: drawer on phones, inline links from tablet up */
+.om-bar-links { display: none; }
+.om-menu-btn { display: inline-flex; }
+@media (min-width: 768px) {
+  .om-bar-links { display: flex; align-items: center; gap: clamp(16px, 2.4vw, 36px); }
+  .om-menu-btn { display: none; }
+  .om-drawer { display: none !important; }
+}
+
+
+/* ---- Static export additions ---- */
+:root {
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.45);
+  --shadow-lg: 0 20px 48px rgba(0,0,0,0.5);
+  --radius-md: 0px;
+}
+html { scroll-behavior: smooth; }
+body {
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; }
+*, *::before, *::after { box-sizing: border-box; }
+.wp-page { position: relative; width: 100%; }
+:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+.tag {
+  display: inline-flex; align-items: center; min-height: 28px; padding: 0 10px;
+  font-family: var(--font-body); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+}
+.tag-outline { border: 1px solid var(--color-divider); color: var(--color-text); }
+
+/* Two-tile hover (Design / Manufacture) */
+.wp-tile > div:nth-child(1) { transition: transform 900ms cubic-bezier(.22,.61,.36,1); }
+.wp-tile:hover > div:nth-child(1), .wp-tile:focus-visible > div:nth-child(1) { transform: scale(1.06) !important; }
+.wp-tile:hover > div:nth-child(2), .wp-tile:focus-visible > div:nth-child(2) { background: rgba(16,15,14,0.58) !important; }
+.wp-tile:hover > div:nth-child(3), .wp-tile:focus-visible > div:nth-child(3) { gap: 14px !important; }
+.wp-tile > div:nth-child(3) p { opacity: 0; max-height: 0; }
+.wp-tile:hover > div:nth-child(3) p, .wp-tile:focus-visible > div:nth-child(3) p { opacity: 1 !important; max-height: 220px !important; }
+
+/* Compare slider */
+.wp-compare { -webkit-appearance: none; appearance: none; background: transparent; }
+.wp-compare::-webkit-slider-thumb { -webkit-appearance: none; width: 64px; height: 100%; }
+
+/* Filtering / pagination */
+[data-card][hidden] { display: none !important; }
+.wp-pager button, .wp-pager span[data-pager-num] {
+  min-width: 44px; min-height: 44px; padding: 0 12px; text-align: center; font-family: var(--font-body);
+  font-size: 12px; letter-spacing: 0.12em; background: transparent;
+  color: color-mix(in srgb, var(--color-text) 70%, transparent); border: 1px solid var(--color-divider); cursor: pointer;
+}
+.wp-pager span[data-pager-num] {
+  display: inline-flex; align-items: center; justify-content: center; line-height: 1;
+  height: 44px; box-sizing: border-box; padding: 0 12px;
+}
+.wp-pager span[data-pager-num][data-active] { background: var(--color-text); color: var(--color-bg); border-color: var(--color-text); cursor: default; }
+.wp-pager [data-pager-arrow] {
+  display: inline-flex; align-items: center; gap: 12px; min-height: 44px; padding: 0; border: 0;
+  border-bottom: 1px solid var(--color-divider); background: none; color: var(--color-text);
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; cursor: pointer; font-family: var(--font-body);
+}
+.wp-pager [data-pager-arrow][disabled] { color: color-mix(in srgb, var(--color-text) 35%, transparent); border-bottom-color: transparent; cursor: default; }
+.wp-pager-nums { flex: 1 1 auto; display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+/* Generated hover states (from the design source) */
+.wh1:hover, .wh1:focus-visible { border-bottom-color: #100f0e !important; gap: 22px !important; }
+.wh2:hover, .wh2:focus-visible { border-bottom-color: #ffffff !important; gap: 20px !important; }
+.wh3:hover, .wh3:focus-visible { border-bottom-color: #ffffff !important; gap: 20px !important; }
+.wh4:hover, .wh4:focus-visible { border-bottom-color: #ffffff !important; gap: 20px !important; }
+.wh5:hover, .wh5:focus-visible { background: #ffffff !important; color: #100f0e !important; border-color: #ffffff !important; }
+.wh6:hover, .wh6:focus-visible { background: #ffffff !important; color: #100f0e !important; border-color: #ffffff !important; }
+.wh7:hover, .wh7:focus-visible { border-bottom-color: #100f0e !important; gap: 22px !important; }
+.wh8:hover, .wh8:focus-visible { border-bottom-color: #ffffff !important; gap: 20px !important; }
+.wh9:hover, .wh9:focus-visible { border-bottom-color: #ffffff !important; gap: 20px !important; }
+.wh10:hover, .wh10:focus-visible { gap: 26px !important; }
+.wh11:hover, .wh11:focus-visible { opacity: 1 !important; }
+.wh12:hover, .wh12:focus-visible { opacity: 1 !important; }
+.wh13:hover, .wh13:focus-visible { opacity: 1 !important; }
+.wh14:hover, .wh14:focus-visible { opacity: 1 !important; }
+.wh15:hover, .wh15:focus-visible { opacity: 1 !important; }
+.wh16:hover, .wh16:focus-visible { opacity: 1 !important; }
+.wh17:hover, .wh17:focus-visible { opacity: 1 !important; }
+.wh18:hover, .wh18:focus-visible { opacity: 1 !important; }
+.wh19:hover, .wh19:focus-visible { opacity: 1 !important; }
+.wh20:hover, .wh20:focus-visible { opacity: 1 !important; }
+.wh21:hover, .wh21:focus-visible { opacity: 1 !important; }
+.wh22:hover, .wh22:focus-visible { opacity: 1 !important; }
+.wh23:hover, .wh23:focus-visible { background: #100f0e !important; color: #ffffff !important; border-color: #100f0e !important; }
+.wh24:hover, .wh24:focus-visible { background: #100f0e !important; color: #ffffff !important; border-color: #100f0e !important; }
+.wh25:hover, .wh25:focus-visible { background: #100f0e !important; color: #ffffff !important; border-color: #100f0e !important; }
+.wh26:hover, .wh26:focus-visible { gap: 26px !important; }
+.wh27:hover, .wh27:focus-visible { opacity: 1 !important; }
+.wh28:hover, .wh28:focus-visible { opacity: 1 !important; }
+.wh29:hover, .wh29:focus-visible { opacity: 1 !important; }
+.wh30:hover, .wh30:focus-visible { opacity: 1 !important; }
+.wh31:hover, .wh31:focus-visible { opacity: 1 !important; }
+.wh32:hover, .wh32:focus-visible { opacity: 1 !important; }
+.wh33:hover, .wh33:focus-visible { opacity: 1 !important; }
+.wh34:hover, .wh34:focus-visible { opacity: 1 !important; }
+.wh35:hover, .wh35:focus-visible { opacity: 1 !important; }
+.wh36:hover, .wh36:focus-visible { opacity: 1 !important; }
+.wh37:hover, .wh37:focus-visible { opacity: 1 !important; }
+.wh38:hover, .wh38:focus-visible { background: #100f0e !important; color: #ffffff !important; border-color: #100f0e !important; }
+.wh39:hover, .wh39:focus-visible { background: #100f0e !important; color: #ffffff !important; border-color: #100f0e !important; }
+.wh40:hover, .wh40:focus-visible { background: #100f0e !important; color: #ffffff !important; border-color: #100f0e !important; }
+.wh41:hover, .wh41:focus-visible { gap: 26px !important; }
+.wh42:hover, .wh42:focus-visible { opacity: 1 !important; }
+.wh43:hover, .wh43:focus-visible { opacity: 1 !important; }
+.wh44:hover, .wh44:focus-visible { opacity: 1 !important; }
+.wh45:hover, .wh45:focus-visible { opacity: 1 !important; }
+.wh46:hover, .wh46:focus-visible { opacity: 1 !important; }
+.wh47:hover, .wh47:focus-visible { opacity: 1 !important; }
+.wh48:hover, .wh48:focus-visible { opacity: 1 !important; }
+.wh49:hover, .wh49:focus-visible { opacity: 1 !important; }
+.wh50:hover, .wh50:focus-visible { opacity: 1 !important; }
+.wh51:hover, .wh51:focus-visible { opacity: 1 !important; }
+.wh52:hover, .wh52:focus-visible { opacity: 1 !important; }
+.wh53:hover, .wh53:focus-visible { background: #100f0e !important; color: #ffffff !important; border-color: #100f0e !important; }
+.wh54:hover, .wh54:focus-visible { background: #100f0e !important; color: #ffffff !important; border-color: #100f0e !important; }
+.wh55:hover, .wh55:focus-visible { background: #100f0e !important; color: #ffffff !important; border-color: #100f0e !important; }
+.wh56:hover, .wh56:focus-visible { gap: 26px !important; }
+.wh57:hover, .wh57:focus-visible { opacity: 1 !important; }
+.wh58:hover, .wh58:focus-visible { opacity: 1 !important; }
+.wh59:hover, .wh59:focus-visible { opacity: 1 !important; }
+.wh60:hover, .wh60:focus-visible { opacity: 1 !important; }
+.wh61:hover, .wh61:focus-visible { opacity: 1 !important; }
+.wh62:hover, .wh62:focus-visible { opacity: 1 !important; }
+.wh63:hover, .wh63:focus-visible { opacity: 1 !important; }
+.wh64:hover, .wh64:focus-visible { opacity: 1 !important; }
+.wh65:hover, .wh65:focus-visible { opacity: 1 !important; }
+.wh66:hover, .wh66:focus-visible { opacity: 1 !important; }
+.wh67:hover, .wh67:focus-visible { opacity: 1 !important; }
+.wh68:hover, .wh68:focus-visible { opacity: 1 !important; }
+.wh69:hover, .wh69:focus-visible { background: #ffffff !important; color: #100f0e !important; border-color: #ffffff !important; }
+.wh70:hover, .wh70:focus-visible { background: #ffffff !important; color: #100f0e !important; border-color: #ffffff !important; }
+.wh71:hover, .wh71:focus-visible { background: #ffffff !important; color: #100f0e !important; border-color: #ffffff !important; }
+.wh72:hover, .wh72:focus-visible { background: #ffffff !important; color: #100f0e !important; }
+.wh73:hover, .wh73:focus-visible { background: #ffffff !important; color: #100f0e !important; }
+.wh74:hover, .wh74:focus-visible { background: #ffffff !important; color: #100f0e !important; }
+.wh75:hover, .wh75:focus-visible { border-bottom-color: #ffffff !important; gap: 20px !important; }
+.wh76:hover, .wh76:focus-visible { background: #ffffff !important; color: #100f0e !important; border-color: #ffffff !important; }
+.wh77:hover, .wh77:focus-visible { background: #ffffff !important; color: #100f0e !important; border-color: #ffffff !important; }
+.wh78:hover, .wh78:focus-visible { gap: 26px !important; }
+.wh79:hover, .wh79:focus-visible { opacity: 1 !important; }
+.wh80:hover, .wh80:focus-visible { opacity: 1 !important; }
+.wh81:hover, .wh81:focus-visible { opacity: 1 !important; }
+.wh82:hover, .wh82:focus-visible { opacity: 1 !important; }
+.wh83:hover, .wh83:focus-visible { opacity: 1 !important; }
+.wh84:hover, .wh84:focus-visible { opacity: 1 !important; }
+.wh85:hover, .wh85:focus-visible { opacity: 1 !important; }
+.wh86:hover, .wh86:focus-visible { opacity: 1 !important; }
+.wh87:hover, .wh87:focus-visible { opacity: 1 !important; }
+.wh88:hover, .wh88:focus-visible { opacity: 1 !important; }
+.wh89:hover, .wh89:focus-visible { opacity: 1 !important; }
+.wh90:hover, .wh90:focus-visible { background: #100f0e !important; color: #ffffff !important; border-color: #100f0e !important; }
+.wh91:hover, .wh91:focus-visible { background: #100f0e !important; color: #ffffff !important; border-color: #100f0e !important; }
+.wh92:hover, .wh92:focus-visible { background: #100f0e !important; color: #ffffff !important; border-color: #100f0e !important; }
+.wh93:hover, .wh93:focus-visible { gap: 26px !important; }
+.wh94:hover, .wh94:focus-visible { opacity: 1 !important; }
+.wh95:hover, .wh95:focus-visible { opacity: 1 !important; }
+.wh96:hover, .wh96:focus-visible { opacity: 1 !important; }
+.wh97:hover, .wh97:focus-visible { opacity: 1 !important; }
+.wh98:hover, .wh98:focus-visible { opacity: 1 !important; }
+.wh99:hover, .wh99:focus-visible { opacity: 1 !important; }
+.wh100:hover, .wh100:focus-visible { opacity: 1 !important; }
+.wh101:hover, .wh101:focus-visible { opacity: 1 !important; }
+.wh102:hover, .wh102:focus-visible { opacity: 1 !important; }
+.wh103:hover, .wh103:focus-visible { opacity: 1 !important; }
+.wh104:hover, .wh104:focus-visible { opacity: 1 !important; }
+.wh105:hover, .wh105:focus-visible { background: #100f0e !important; color: #ffffff !important; border-color: #100f0e !important; }
+.wh106:hover, .wh106:focus-visible { background: #100f0e !important; color: #ffffff !important; border-color: #100f0e !important; }
+.wh107:hover, .wh107:focus-visible { background: #100f0e !important; color: #ffffff !important; border-color: #100f0e !important; }
