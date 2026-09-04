@@ -19,7 +19,7 @@
   --color-neutral-800: #dcd6cd;
   --color-neutral-900: #0a0908;
   --on-accent: #f7f3ee;
-  --site-header-h: 52px;
+  --site-header-h: 64px;
 }
 
 ::selection { background: color-mix(in srgb, var(--color-accent) 45%, transparent); }
@@ -42,10 +42,20 @@ a:hover { color: var(--color-accent-700); }
 /* Header: drawer on phones, inline links from tablet up */
 .om-bar-links { display: none; }
 .om-menu-btn { display: inline-flex; }
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .om-bar-links { display: flex; align-items: center; gap: clamp(16px, 2.4vw, 36px); }
   .om-menu-btn { display: none; }
   .om-drawer { display: none !important; }
+}
+
+/* Hero headline: single line on desktop, wraps naturally on phones/tablets to avoid clipping */
+@media (max-width: 1023px) {
+  .hero-line { white-space: normal !important; }
+}
+
+/* 6D System section: hide the side image on phones/tablets */
+@media (max-width: 1023px) {
+  .v2-system-image { display: none !important; }
 }
 
 
@@ -110,9 +120,9 @@ img { max-width: 100%; }
 
 /* Generated hover states (from the design source) */
 .wh1:hover, .wh1:focus-visible { border-bottom-color: #100f0e !important; gap: 22px !important; }
-.wh2:hover, .wh2:focus-visible { border-bottom-color: #ffffff !important; gap: 20px !important; }
-.wh3:hover, .wh3:focus-visible { border-bottom-color: #ffffff !important; gap: 20px !important; }
-.wh4:hover, .wh4:focus-visible { border-bottom-color: #ffffff !important; gap: 20px !important; }
+.wh2:hover, .wh2:focus-visible { border-bottom-color: #ffffff !important; }
+.wh3:hover, .wh3:focus-visible { border-bottom-color: #ffffff !important; }
+.wh4:hover, .wh4:focus-visible { border-bottom-color: #ffffff !important; }
 .wh5:hover, .wh5:focus-visible { background: #ffffff !important; color: #100f0e !important; border-color: #ffffff !important; }
 .wh6:hover, .wh6:focus-visible { background: #ffffff !important; color: #100f0e !important; border-color: #ffffff !important; }
 .wh7:hover, .wh7:focus-visible { border-bottom-color: #100f0e !important; gap: 22px !important; }
