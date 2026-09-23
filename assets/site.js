@@ -44,16 +44,42 @@
     var slides = slidesIn(section);
     if (!slides.length) return;
     var n = (idx + slides.length) % slides.length;
+    var zoom = section.getAttribute('data-zoom') || '1.04';
     section.setAttribute('data-current', String(n));
     slides.forEach(function (s, i) {
       var on_ = i === n;
       s.style.opacity = on_ ? '1' : '0';
-      s.style.transform = on_ ? 'scale(1)' : 'scale(1.04)';
+      s.style.transform = on_ ? 'scale(1)' : 'scale(' + zoom + ')';
       s.style.pointerEvents = on_ ? 'auto' : 'none';
     });
     all('.wp-dots span', section).forEach(function (dot, i) {
       dot.style.background = i === n ? '#ffffff' : 'rgba(255,255,255,0.3)';
     });
+  }
+
+  /* ---------- autoplay for carousels marked data-autoplay="<ms>" ---------- */
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function stopAutoplay(section) {
+    if (section._autoplayTimer) { clearInterval(section._autoplayTimer); section._autoplayTimer = null; }
+  }
+  function startAutoplay(section) {
+    if (reduceMotion) return;
+    var ms = Number(section.getAttribute('data-autoplay')) || 0;
+    if (!ms) return;
+    stopAutoplay(section);
+    section._autoplayTimer = setInterval(function () {
+      var cur = Number(section.getAttribute('data-current') || 0);
+      showSlide(section, cur + 1);
+    }, ms);
+  }
+
+  /* ---------- dots as direct navigation ---------- */
+  function goToDot(dot) {
+    var section = dot.closest('section');
+    if (!section) return;
+    var idx = Array.prototype.indexOf.call(dot.parentNode.children, dot);
+    showSlide(section, idx);
+    if (section.hasAttribute('data-autoplay')) startAutoplay(section);
   }
 
   /* ---------- before / after compare ---------- */
@@ -168,6 +194,8 @@
 
   /* ---------- delegated clicks ---------- */
   on(d, 'click', function (e) {
+    var dot = e.target.closest('.wp-dots span');
+    if (dot) { goToDot(dot); return; }
     var t = e.target.closest('[data-action], [data-pager-arrow], [data-goto]');
     if (!t) return;
     if (t.hasAttribute('data-pager-arrow')) {
@@ -185,6 +213,7 @@
       var section = t.closest('section');
       var cur = Number(section.getAttribute('data-current') || 0);
       showSlide(section, cur + (act === 'hero-next' ? 1 : -1));
+      if (section.hasAttribute('data-autoplay')) startAutoplay(section);
     }
     else if (act === 'gallery-prev') galleryGo(-1);
     else if (act === 'gallery-next') galleryGo(1);
@@ -201,6 +230,13 @@
 
   /* ---------- init ---------- */
   all('section').forEach(function (s) { if (slidesIn(s).length) showSlide(s, 0); });
+  all('[data-autoplay]').forEach(function (section) {
+    startAutoplay(section);
+    on(section, 'mouseenter', function () { stopAutoplay(section); });
+    on(section, 'mouseleave', function () { startAutoplay(section); });
+    on(section, 'focusin', function () { stopAutoplay(section); });
+    on(section, 'focusout', function () { startAutoplay(section); });
+  });
   setMenu(false);
   var firstFilter = d.querySelector('[data-action="filter"]');
   if (firstFilter) {

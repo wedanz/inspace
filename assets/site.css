@@ -20,6 +20,10 @@
   --color-neutral-900: #0a0908;
   --on-accent: #f7f3ee;
   --site-header-h: 64px;
+  --fs-sm: 13px;
+  --fs-base: 16px;
+  --fs-lg: clamp(30px, 3.4vw, 50px);
+  --fs-logo: 32px;
 }
 
 ::selection { background: color-mix(in srgb, var(--color-accent) 45%, transparent); }
@@ -57,7 +61,6 @@ a:hover { color: var(--color-accent-700); }
 @media (max-width: 1023px) {
   .v2-system-image { display: none !important; }
 }
-
 
 /* ---- Static export additions ---- */
 :root {
