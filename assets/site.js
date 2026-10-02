@@ -11,7 +11,7 @@
   var header = d.querySelector('[data-header]');
   function headerState() {
     if (!header) return;
-    var solid = window.scrollY > window.innerHeight * 0.6 || d.documentElement.classList.contains('menu-open');
+    var solid = header.hasAttribute('data-solid') || window.scrollY > window.innerHeight * 0.6 || d.documentElement.classList.contains('menu-open');
     header.style.background = solid ? 'var(--color-bg)' : 'transparent';
     header.style.borderBottom = solid ? '2px solid var(--color-divider)' : '2px solid transparent';
     header.style.backdropFilter = solid ? 'none' : 'blur(2px)';
@@ -279,6 +279,17 @@
     }, { passive: false });
     setShield(false);
   })();
+
+  /* ---------- match a section's min-height to another's: data-match-height="#selector" ---------- */
+  all('[data-match-height]').forEach(function (el) {
+    var ref = d.querySelector(el.getAttribute('data-match-height'));
+    if (!ref) return;
+    function sync() { el.style.minHeight = ref.offsetHeight + 'px'; }
+    sync();
+    on(window, 'resize', sync);
+    on(window, 'load', sync);
+    if (window.ResizeObserver) new ResizeObserver(sync).observe(ref);
+  });
 
   on(window, 'resize', headerState);
 })();

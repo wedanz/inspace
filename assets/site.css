@@ -1,6 +1,7 @@
 /* INSPACE STUDIO — static site styles (WordPress-ready, no build step) */
 /* INSPACE STUDIO — shared site theme. Loaded by every page. */
 :root {
+  --nav-h: 64px; /* sticky navbar height; sections = 100dvh - this */
   --font-heading: 'Barlow', system-ui, sans-serif;
   --font-body: 'Montserrat', system-ui, sans-serif;
   --color-bg: #100f0e;
@@ -69,7 +70,7 @@ a:hover { color: var(--color-accent-700); }
   --shadow-lg: 0 20px 48px rgba(0,0,0,0.5);
   --radius-md: 0px;
 }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; scroll-padding-top: var(--nav-h); }
 body {
   overflow-x: hidden;
   overflow-y: auto;
