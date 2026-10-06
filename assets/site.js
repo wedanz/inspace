@@ -239,7 +239,14 @@
   });
   setMenu(false);
   var firstFilter = d.querySelector('[data-action="filter"]');
-  if (firstFilter) {
+  /* deep link: projects.html#apartment preselects that filter */
+  var hashFilter = decodeURIComponent(location.hash.slice(1)).toLowerCase();
+  var linkedFilter = hashFilter && all('[data-action="filter"]').filter(function (b) {
+    return (b.getAttribute('data-filter') || '').toLowerCase() === hashFilter;
+  })[0];
+  if (linkedFilter) {
+    setFilter(linkedFilter.getAttribute('data-filter'), linkedFilter);
+  } else if (firstFilter) {
     state.filter = firstFilter.getAttribute('data-filter');
     firstFilter.style.borderBottomColor = 'currentColor';
     firstFilter.style.opacity = '1';
