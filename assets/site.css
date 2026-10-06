@@ -230,3 +230,6 @@ img { max-width: 100%; }
 .wh105:hover, .wh105:focus-visible { background: #100f0e !important; color: #ffffff !important; border-color: #100f0e !important; }
 .wh106:hover, .wh106:focus-visible { background: #100f0e !important; color: #ffffff !important; border-color: #100f0e !important; }
 .wh107:hover, .wh107:focus-visible { background: #100f0e !important; color: #ffffff !important; border-color: #100f0e !important; }
+
+/* Be Inspired — project type links */
+.v2-type-link:hover, .v2-type-link:focus-visible { color: #100f0e !important; border-bottom: 1px solid #100f0e !important; }
