@@ -146,11 +146,20 @@
     return next && next.classList && next.classList.contains('wp-pager') ? next : null;
   }
 
+  /* data-rows="2" pages by full grid rows: per page = current column count × rows */
+  function gridColumns(grid) {
+    return getComputedStyle(grid).gridTemplateColumns.split(' ').filter(Boolean).length || 1;
+  }
+  function perPage(grid, pager) {
+    var rows = Number(pager.getAttribute('data-rows'));
+    return rows ? gridColumns(grid) * rows : Number(pager.getAttribute('data-per-page') || 6);
+  }
+
   function applyList(scrollToList) {
     grids().forEach(function (grid) {
       var vis = visibleCards(grid);
       var pager = pagerFor(grid);
-      var per = pager ? Number(pager.getAttribute('data-per-page') || 6) : Infinity;
+      var per = pager ? perPage(grid, pager) : Infinity;
       if (pager) renderPager(pager, vis.length, per);
       all('[data-card]', grid).forEach(function (c) { c.hidden = true; });
       var slice = pager ? vis.slice(state.page * per, state.page * per + per) : vis.slice(0, 3);
@@ -252,6 +261,18 @@
     firstFilter.style.opacity = '1';
   }
   if (d.querySelector('[data-card]') || d.querySelector('.wp-pager')) applyList(false);
+  /* row-based pagers: re-page when the column count changes, staying on the first card in view */
+  var rowGrid = all('.wp-pager[data-rows]').map(function (p) { return p.previousElementSibling; })[0];
+  if (rowGrid) {
+    var lastPer = perPage(rowGrid, rowGrid.nextElementSibling);
+    on(window, 'resize', function () {
+      var per = perPage(rowGrid, rowGrid.nextElementSibling);
+      if (per === lastPer) return;
+      state.page = Math.floor(state.page * lastPer / per);
+      lastPer = per;
+      applyList(false);
+    });
+  }
   /* ---------- capture / zoom guard (matches the prototype) ---------- */
   var shield = d.querySelector('[data-shield]');
   function setShield(on) { if (shield) shield.style.display = on ? 'flex' : 'none'; }
