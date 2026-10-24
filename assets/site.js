@@ -273,29 +273,71 @@
       applyList(false);
     });
   }
-  /* ---------- capture / zoom guard (matches the prototype) ---------- */
+  /* ---------- capture / zoom guard ----------
+     A web page cannot block OS screenshots. This covers the page with the black
+     INSPACE STUDIO panel at the moments a capture is likely, so most screenshots
+     show the panel instead of the content:
+     - Cmd+Shift (Mac: Cmd+Shift+3/4/5, Firefox's Cmd+Shift+S) or Win+Shift
+       (Windows: Win+Shift+S) is held, PrintScreen, Ctrl/Cmd+P;
+     - the window loses focus or the tab is hidden (snipping tools, screen recorders,
+       app switching) — except when focus moves into the page's own map/video iframes;
+     - the mouse pointer leaves the page (screenshot toolbars and overlays that open
+       over the browser without taking focus) — mouse devices only;
+     - printing (also covered in site.css, for print started from the browser menu).
+     The panel disappears 0.5 s after the visitor is back on the page: real mouse
+     movement, a click, tap, scroll or key press, or the window regaining focus.
+     While a screenshot tool's selection overlay is up, the page receives none of
+     those, so the panel stays until the capture is over. */
   var shield = d.querySelector('[data-shield]');
   function setShield(on) { if (shield) shield.style.display = on ? 'flex' : 'none'; }
   (function () {
     var vp = d.querySelector('meta[name="viewport"]');
     if (vp) vp.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no');
-    var show = function () { setShield(true); };
-    var hide = function () { setShield(false); };
+    var COVER_MS = 500;
+    var timer = null;
+    var waiting = false; /* covered, waiting for the visitor to be back */
+    var hide = function () { clearTimeout(timer); timer = null; waiting = false; setShield(false); };
+    var cover = function () { clearTimeout(timer); timer = null; waiting = true; setShield(true); };
+    var back = function () { if (waiting) { waiting = false; timer = setTimeout(hide, COVER_MS); } };
+    var isModifier = function (k) { return k === 'Meta' || k === 'OS' || k === 'Shift' || k === 'Control' || k === 'Alt'; };
     on(window, 'keydown', function (e) {
       var k = e.key;
-      if (k === 'PrintScreen' || (e.metaKey && e.shiftKey && ['3', '4', '5', 'S', 's'].indexOf(k) > -1)) { show(); e.preventDefault(); return; }
+      if (k === 'PrintScreen' || (e.metaKey && e.shiftKey)) { cover(); if (k !== 'Shift' && k !== 'Meta') e.preventDefault(); return; }
       if ((e.ctrlKey || e.metaKey) && ['+', '-', '=', '_', '0'].indexOf(k) > -1) e.preventDefault();
-      if ((e.ctrlKey || e.metaKey) && (k === 'p' || k === 'P')) { show(); e.preventDefault(); }
-    });
+      if ((e.ctrlKey || e.metaKey) && (k === 'p' || k === 'P')) { cover(); e.preventDefault(); return; }
+      if (!isModifier(k)) back();
+    }, true);
     on(window, 'keyup', function (e) {
       if (e.key !== 'PrintScreen') return;
+      cover(); /* Windows often reports PrintScreen only on key release */
       try { navigator.clipboard.writeText(''); } catch (err) {}
-      setTimeout(hide, 1200);
+    }, true);
+    /* Only real movement counts — browsers also send zero-distance mousemoves when
+       the page changes under a still pointer (e.g. when the panel itself appears). */
+    on(d, 'mousemove', function (e) { if (e.movementX || e.movementY) back(); }, { passive: true });
+    on(d, 'pointerdown', back, { passive: true });
+    on(d, 'touchstart', back, { passive: true });
+    on(window, 'wheel', back, { passive: true });
+    on(window, 'blur', function () {
+      setTimeout(function () {
+        var el = d.activeElement;
+        if (el && el.tagName === 'IFRAME') return; /* clicked into a map or video on the page */
+        cover();
+      }, 0);
     });
-    on(d, 'visibilitychange', function () { if (d.hidden) show(); else setTimeout(hide, 250); });
-    on(window, 'beforeprint', show);
+    on(window, 'focus', back);
+    if (window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      /* mouseleave for Chrome/Safari; Firefox reliably reports leaving the window
+         only as a mouseout with no element to go to */
+      on(d.documentElement, 'mouseleave', cover);
+      on(d, 'mouseout', function (e) { if (!e.relatedTarget) cover(); });
+    }
+    on(d, 'visibilitychange', function () { if (d.hidden) cover(); else back(); });
+    on(window, 'beforeprint', cover);
     on(window, 'afterprint', hide);
     on(d, 'contextmenu', function (e) { e.preventDefault(); });
+    /* no dragging photos out of the page */
+    on(d, 'dragstart', function (e) { if (e.target && e.target.tagName === 'IMG') e.preventDefault(); });
     on(window, 'wheel', function (e) { if (e.ctrlKey) e.preventDefault(); }, { passive: false });
     on(d, 'gesturestart', function (e) { e.preventDefault(); });
     on(d, 'gesturechange', function (e) { e.preventDefault(); });

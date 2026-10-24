@@ -233,3 +233,14 @@ img { max-width: 100%; }
 
 /* Be Inspired — project type links */
 .v2-type-link:hover, .v2-type-link:focus-visible { color: #100f0e !important; border-bottom: 1px solid #100f0e !important; }
+
+/* Content protection: no long-press "Save image" / drag on photos, and printing
+   (including from the browser menu) shows only the black INSPACE STUDIO panel. */
+img { -webkit-touch-callout: none; -webkit-user-drag: none; user-select: none; }
+@media print {
+  body > *:not([data-shield]) { display: none !important; }
+  [data-shield] {
+    display: flex !important; position: static !important; height: 100vh;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+}
