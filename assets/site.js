@@ -287,7 +287,9 @@
      The panel disappears 0.5 s after the visitor is back on the page: real mouse
      movement, a click, tap, scroll or key press, or the window regaining focus.
      While a screenshot tool's selection overlay is up, the page receives none of
-     those, so the panel stays until the capture is over. */
+     those, so the panel stays until the capture is over. Mouse movement over a
+     background window (macOS Screenshot app opened from Spotlight/Launchpad) does
+     not count: while the browser window has no focus, only regaining focus does. */
   var shield = d.querySelector('[data-shield]');
   function setShield(on) { if (shield) shield.style.display = on ? 'flex' : 'none'; }
   (function () {
@@ -298,7 +300,11 @@
     var waiting = false; /* covered, waiting for the visitor to be back */
     var hide = function () { clearTimeout(timer); timer = null; waiting = false; setShield(false); };
     var cover = function () { clearTimeout(timer); timer = null; waiting = true; setShield(true); };
-    var back = function () { if (waiting) { waiting = false; timer = setTimeout(hide, COVER_MS); } };
+    var back = function () {
+      if (!waiting || !d.hasFocus()) return; /* window in the background: keep covered */
+      waiting = false;
+      timer = setTimeout(hide, COVER_MS);
+    };
     var isModifier = function (k) { return k === 'Meta' || k === 'OS' || k === 'Shift' || k === 'Control' || k === 'Alt'; };
     on(window, 'keydown', function (e) {
       var k = e.key;
