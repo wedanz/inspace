@@ -244,3 +244,11 @@ img { -webkit-touch-callout: none; -webkit-user-drag: none; user-select: none; }
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
 }
+
+/* "Other projects" / "More from the journal" rows: three columns from tablet up;
+   on phones, stacked — photo first at a usable size, then place/date, then the title. */
+@media (max-width: 767px) {
+  .wp-related-row { grid-template-columns: 1fr !important; gap: 14px !important; }
+  .wp-related-row > div { order: -1; aspect-ratio: 16 / 9 !important; }
+  .wp-related-row > h3 { max-width: none !important; }
+}
