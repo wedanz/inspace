@@ -423,10 +423,20 @@
 <!-- Long consultation button, centred at the bottom (mobile/tablet) -->
 <style>
   /* Mobile/tablet only: shown where the header collapses into "Menu" (below 1024px). */
-  .wa-cta { display: none; transition: opacity 250ms ease, translate 250ms ease, visibility 250ms; }
+  .wa-cta { display: none; }
   @media (max-width: 1023px) { .wa-cta { display: flex; } }
-  /* hidden over the hero and the footer (see the script below) */
-  .wa-cta.wa-hidden { opacity: 0; visibility: hidden; translate: 0 12px; pointer-events: none; }
+  /* shown from "About us" until the closing section (see the script below) */
+  .wa-cta.wa-hidden { opacity: 0; visibility: hidden; translate: 0 16px; pointer-events: none; }
+  /* Motion (site easing): eases in on appear, presses on tap, one gentle "ring" of the icon on first appearance. */
+  .wa-cta { transition: opacity 450ms cubic-bezier(.22,.61,.36,1), translate 450ms cubic-bezier(.22,.61,.36,1), scale 450ms cubic-bezier(.22,.61,.36,1), visibility 450ms; }
+  .wa-cta:active { scale: 0.97; transition-duration: 120ms; }
+  .wa-cta.wa-intro svg { animation: wa-ring 900ms cubic-bezier(.22,.61,.36,1) 350ms 1 both; transform-origin: 50% 60%; }
+  @keyframes wa-ring { 0% { rotate: 0deg; } 20% { rotate: -14deg; } 40% { rotate: 11deg; } 60% { rotate: -7deg; } 80% { rotate: 3deg; } 100% { rotate: 0deg; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .wa-cta, .wa-cta.wa-hidden { translate: none; scale: none; transition: opacity 300ms ease, visibility 300ms; }
+    .wa-cta.wa-intro svg, .wa-cta.wa-intro .wa-arrow { animation: none; }
+  }
   /* same type as the site's "Request a consultation" buttons */
   .wa-cta { align-items: center; justify-content: center; gap: 10px; font-family: var(--font-body); font-weight: 400; font-size: var(--fs-sm); letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none; }
   .wa-cta svg { flex: none; }
@@ -440,22 +450,28 @@
 </style>
 <a class="wa-cta wa-bar wa-hidden" href="https://api.whatsapp.com/send?phone=6282218630009&text=Halo%20Tim%20Inspace%20Studio%21%20Saya%20baru%20melihat-lihat%20layanan%20desain%20di%20website%20Inspace%20dan%20tertarik%20untuk%20berkonsultasi.%0A%0A%F0%9F%93%8B%20%2ADetail%20Singkat%20Proyek%3A%2A%0A%E2%80%A2%20%2AJenis%20Proyek%3A%2A%20%5BResidential%20%2F%20Apartement%20%2F%20Commercial%20%2F%20Office%5D%0A%E2%80%A2%20%2ALokasi%3A%2A%20%5BNama%20Kota%5D%0A%0ABoleh%20bantu%20saya%20untuk%20jadwal%20sesi%20konsultasinya%3F%20Terima%20kasih%21" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9"/><path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1"/></svg><span>Request a consultation</span></a>
 <script>
-/* Hide the WhatsApp button while the hero (first screen) or the footer is on screen. */
+/* Show the WhatsApp button from the "About us" section until the closing ("Close") section comes into view. */
 (function () {
   var btn = document.querySelector('.wa-cta');
-  if (!btn || !('IntersectionObserver' in window)) return;
-  var hero = document.querySelector('[data-screen-label="Hero"]');
+  var about = document.querySelector('[data-screen-label="About us"]');
   var close = document.querySelector('[data-screen-label="Close"]');
-  var footer = close && close.lastElementChild;
-  var inView = { hero: false, footer: false };
-  function update() { btn.classList.toggle('wa-hidden', inView.hero || inView.footer); }
-  function watch(el, key, margin) {
-    if (!el) return;
-    new IntersectionObserver(function (entries) { inView[key] = entries[0].isIntersecting; update(); },
-      { rootMargin: margin }).observe(el);
+  if (!btn || !about || !close) return;
+  var queued = false;
+  function update() {
+    queued = false;
+    var h = window.innerHeight;
+    var show = about.getBoundingClientRect().top < h && close.getBoundingClientRect().top >= h;
+    btn.classList.toggle('wa-hidden', !show);
+    /* first appearance: one gentle ring of the icon */
+    if (show && !btn.dataset.introDone) {
+      btn.dataset.introDone = '1';
+      btn.classList.add('wa-intro');
+      setTimeout(function () { btn.classList.remove('wa-intro'); }, 1800);
+    }
   }
-  watch(hero, 'hero', '0px 0px -40% 0px');   /* appears once the hero has mostly scrolled away */
-  watch(footer, 'footer', '0px');            /* gone as soon as the footer comes into view */
+  function later() { if (!queued) { queued = true; requestAnimationFrame(update); } }
+  window.addEventListener('scroll', later, { passive: true });
+  window.addEventListener('resize', later);
   update();
 })();
 </script>
