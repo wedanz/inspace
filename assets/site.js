@@ -44,7 +44,7 @@
     var slides = slidesIn(section);
     if (!slides.length) return;
     var n = (idx + slides.length) % slides.length;
-    var zoom = section.getAttribute('data-zoom') || '1.04';
+    var zoom = reduceMotion ? '1' : (section.getAttribute('data-zoom') || '1.04');
     section.setAttribute('data-current', String(n));
     slides.forEach(function (s, i) {
       var on_ = i === n;
@@ -58,12 +58,14 @@
   }
 
   /* ---------- autoplay for carousels marked data-autoplay="<ms>" ---------- */
+  /* Reduced motion (also switched on by Android power saving) keeps autoplay but drops the zoom. */
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* Only a real mouse pauses on hover: a tap on a phone fires mouseenter but never mouseleave. */
+  var canHover = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   function stopAutoplay(section) {
     if (section._autoplayTimer) { clearInterval(section._autoplayTimer); section._autoplayTimer = null; }
   }
   function startAutoplay(section) {
-    if (reduceMotion) return;
     var ms = Number(section.getAttribute('data-autoplay')) || 0;
     if (!ms) return;
     stopAutoplay(section);
@@ -129,9 +131,18 @@
   function renderPager(pager, total, per) {
     var last = Math.max(0, Math.ceil(total / per) - 1);
     if (state.page > last) state.page = last;
-    var nums = '';
+    var nums = '', cur = state.page, gap = false;
     for (var i = 0; i <= last; i++) {
-      nums += i === state.page
+      /* at most 7 items, so it fits a phone: 1 2 3 4 5 … 13 / 1 … 6 7 8 … 13 / 1 … 9 10 11 12 13 */
+      var shown = last <= 6 || i === 0 || i === last || Math.abs(i - cur) <= 1 ||
+        (cur <= 3 && i <= 4) || (cur >= last - 3 && i >= last - 4);
+      if (!shown) {
+        if (!gap) nums += '<span data-pager-gap aria-hidden="true">\u2026</span>';
+        gap = true;
+        continue;
+      }
+      gap = false;
+      nums += i === cur
         ? '<span data-pager-num data-active aria-current="page">' + (i + 1) + '</span>'
         : '<span data-pager-num role="button" tabindex="0" data-goto="' + i + '">' + (i + 1) + '</span>';
     }
@@ -241,10 +252,32 @@
   all('section').forEach(function (s) { if (slidesIn(s).length) showSlide(s, 0); });
   all('[data-autoplay]').forEach(function (section) {
     startAutoplay(section);
-    on(section, 'mouseenter', function () { stopAutoplay(section); });
-    on(section, 'mouseleave', function () { startAutoplay(section); });
-    on(section, 'focusin', function () { stopAutoplay(section); });
+    if (canHover) {
+      on(section, 'mouseenter', function () { stopAutoplay(section); });
+      on(section, 'mouseleave', function () { startAutoplay(section); });
+    }
+    /* keyboard focus pauses; a tapped link (which also takes focus) does not */
+    on(section, 'focusin', function (e) { if (e.target.matches && e.target.matches(':focus-visible')) stopAutoplay(section); });
     on(section, 'focusout', function () { startAutoplay(section); });
+  });
+
+  /* ---------- swipe left/right between slides (vertical swipes still scroll) ---------- */
+  all('section').forEach(function (section) {
+    if (slidesIn(section).length < 2) return;
+    var x0 = null, y0 = 0;
+    on(section, 'touchstart', function (e) {
+      if (e.touches.length !== 1 || e.target.closest('.wp-compare')) { x0 = null; return; }
+      x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+    }, { passive: true });
+    on(section, 'touchend', function (e) {
+      if (x0 === null) return;
+      var dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+      x0 = null;
+      if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
+      var cur = Number(section.getAttribute('data-current') || 0);
+      showSlide(section, cur + (dx < 0 ? 1 : -1));
+      if (section.hasAttribute('data-autoplay')) startAutoplay(section);
+    }, { passive: true });
   });
   setMenu(false);
   var firstFilter = d.querySelector('[data-action="filter"]');
